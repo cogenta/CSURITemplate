@@ -8,6 +8,58 @@
 
 #import "CSURITemplate.h"
 
+
+@protocol CSURITemplateTerm <NSObject>
+
+- (NSString *)expandWithVariables:(NSDictionary *)variables;
+
+@end
+
+@protocol CSURITemplateEscaper <NSObject>
+
+- (NSString *)escapeItem:(id)item;
+
+@end
+
+@protocol CSURITemplateVariable <NSObject>
+
+@property (readonly) NSString *key;
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper;
+- (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
+                                escaper:(id<CSURITemplateEscaper>)escaper
+                                  block:(void (^)(NSString *key, NSString *value))block;
+
+@end
+
+@interface CSURITemplateEscaping : NSObject
+
++ (NSObject<CSURITemplateEscaper> *)uriEscaper;
++ (NSObject<CSURITemplateEscaper> *)fragmentEscaper;
+
+@end
+
+@interface CSURITemplateURIEscaper : NSObject <CSURITemplateEscaper>
+
+@end
+
+@interface CSURITemplateFragmentEscaper : NSObject <CSURITemplateEscaper>
+
+@end
+
+@implementation CSURITemplateEscaping
+
++ (NSObject<CSURITemplateEscaper> *)uriEscaper
+{
+    return [[CSURITemplateURIEscaper alloc] init];
+}
+
++ (NSObject<CSURITemplateEscaper> *)fragmentEscaper
+{
+    return [[CSURITemplateFragmentEscaper alloc] init];
+}
+
+@end
+
 @interface NSObject (URITemplateAdditions)
 
 - (NSString *)stringEscapedForURI;
@@ -16,19 +68,36 @@
 - (NSArray *)explodedItems;
 - (NSArray *)explodedItemsEscapedForURI;
 - (NSArray *)explodedItemsEscapedForFragment;
-- (NSArray *)explodedItemsEscapedWithEscaper:(SEL)escaper;
-- (NSString *)escapeWithEscaper:(SEL)escaper;
-- (void)enumerateExplodedItemsEscapedWithEscaper:(SEL)escaper
+- (NSArray *)explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper;
+- (NSString *)escapeWithEscaper:(id<CSURITemplateEscaper>)escaper;
+- (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)key
                                            block:(void (^)(NSString *key, NSString *value))block;
+@end
+
+@implementation CSURITemplateURIEscaper
+
+- (NSString *)escapeItem:(NSObject *)item
+{
+    return [item stringEscapedForURI];
+}
+
+@end
+
+@implementation CSURITemplateFragmentEscaper
+
+- (NSString *)escapeItem:(NSObject *)item
+{
+    return [item stringEscapedForFragment];
+}
 
 @end
 
 @implementation NSObject (URITemplateAdditions)
 
-- (NSString *)escapeWithEscaper:(SEL)escaper
+- (NSString *)escapeWithEscaper:(id<CSURITemplateEscaper>)escaper
 {
-    return [self performSelector:escaper];
+    return [escaper escapeItem:self];
 }
 
 - (NSString *)stringEscapedForURI
@@ -51,7 +120,7 @@
     return [NSArray arrayWithObject:self];
 }
 
-- (NSArray *)explodedItemsEscapedWithEscaper:(SEL)escaper
+- (NSArray *)explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
 {
     NSMutableArray *result = [NSMutableArray array];
     for (id value in [self explodedItems]) {
@@ -60,7 +129,7 @@
     return [NSArray arrayWithArray:result];
 }
 
-- (void)enumerateExplodedItemsEscapedWithEscaper:(SEL)escaper
+- (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)key
                                            block:(void (^)(NSString *, NSString *))block
 {
@@ -72,12 +141,12 @@
 
 - (NSArray *)explodedItemsEscapedForURI
 {
-    return [self explodedItemsEscapedWithEscaper:@selector(stringEscapedForURI)];
+    return [self explodedItemsEscapedWithEscaper:[CSURITemplateEscaping uriEscaper]];
 }
 
 - (NSArray *)explodedItemsEscapedForFragment
 {
-    return [self explodedItemsEscapedWithEscaper:@selector(stringEscapedForFragment)];
+    return [self explodedItemsEscapedWithEscaper:[CSURITemplateEscaping fragmentEscaper]];
 }
 
 @end
@@ -190,7 +259,7 @@
     return [NSArray arrayWithArray:result];
 }
 
-- (NSArray *)explodedItemsEscapedWithEscaper:(SEL)escaper
+- (NSArray *)explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
 {
     NSMutableArray *result = [NSMutableArray array];
     [self enumerateExplodedItemsEscapedWithEscaper:escaper
@@ -202,7 +271,7 @@
     return [NSArray arrayWithArray:result];
 }
 
-- (void)enumerateExplodedItemsEscapedWithEscaper:(SEL)escaper
+- (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)defaultKey
                                            block:(void (^)(NSString *, NSString *))block
 {
@@ -220,22 +289,6 @@
 {
     return [NSArray array];
 }
-
-@end
-
-@protocol CSURITemplateTerm <NSObject>
-
-- (NSString *)expandWithVariables:(NSDictionary *)variables;
-
-@end
-
-@protocol CSURITemplateVariable <NSObject>
-
-@property (readonly) NSString *key;
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(SEL)escaper;
-- (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
-                                escaper:(SEL)escaper
-                                  block:(void (^)(NSString *key, NSString *value))block;
 
 @end
 
@@ -291,9 +344,9 @@
     return self;
 }
 
-- (SEL)escaper
+- (id<CSURITemplateEscaper>)escaper
 {
-    return @selector(stringEscapedForURI);
+    return [CSURITemplateEscaping uriEscaper];
 }
 
 - (NSString *)prepend
@@ -368,9 +421,9 @@
     return @"";
 }
 
-- (SEL)escaper
+- (id<CSURITemplateEscaper>)escaper
 {
-    return @selector(stringEscapedForURI);
+    return [CSURITemplateEscaping uriEscaper];
 }
 
 - (NSString *)expandWithVariables:(NSDictionary *)variables
@@ -429,9 +482,9 @@
     return @"#";
 }
 
-- (SEL)escaper
+- (id<CSURITemplateEscaper>)escaper
 {
-    return @selector(stringEscapedForFragment);
+    return [CSURITemplateEscaping fragmentEscaper];
 }
 
 @end
@@ -457,9 +510,9 @@
     return self;
 }
 
-- (SEL)escaper
+- (id<CSURITemplateEscaper>)escaper
 {
-    return @selector(stringEscapedForURI);
+    return [CSURITemplateEscaping uriEscaper];
 }
 
 - (NSString *)prepend
@@ -514,9 +567,9 @@
     return self;
 }
 
-- (SEL)escaper
+- (id<CSURITemplateEscaper>)escaper
 {
-    return @selector(stringEscapedForURI);
+    return [CSURITemplateEscaping uriEscaper];
 }
 
 - (NSString *)expandWithVariables:(NSDictionary *)variables
@@ -549,9 +602,9 @@
 
 @implementation CSURITemplateReservedExpressionTerm
 
-- (SEL)escaper
+- (id<CSURITemplateEscaper>)escaper
 {
-    return @selector(stringEscapedForFragment);
+    return [CSURITemplateEscaping fragmentEscaper];
 }
 
 @end
@@ -590,7 +643,7 @@
     return self;
 }
 
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(SEL)escaper
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper
 {
     id value = [variables objectForKey:key];
     if ( ! value || (NSNull *) value == [NSNull null]) {
@@ -609,7 +662,7 @@
 }
 
 - (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
-                                escaper:(SEL)escaper
+                                escaper:(id<CSURITemplateEscaper>)escaper
                                   block:(void (^)(NSString *key, NSString *value))block
 {
     id value = [variables objectForKey:key];
@@ -648,7 +701,7 @@
     return self;
 }
 
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(SEL)escaper
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper
 {
     id values = [variables objectForKey:key];
     if ( ! values) {
@@ -665,7 +718,7 @@
 }
 
 - (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
-                                escaper:(SEL)escaper
+                                escaper:(id<CSURITemplateEscaper>)escaper
                                   block:(void (^)(NSString *key, NSString *value))block
 {
     id values = [variables objectForKey:key];
@@ -703,7 +756,7 @@
     return self;
 }
 
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(SEL)escaper
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper
 {
     id value = [variables objectForKey:key];
     if ( ! value || (NSNull *) value == [NSNull null]) {
@@ -722,7 +775,7 @@
 }
 
 - (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
-                                escaper:(SEL)escaper
+                                escaper:(id<CSURITemplateEscaper>)escaper
                                   block:(void (^)(NSString *key, NSString *value))block
 {
     for (NSString *value in [self valuesWithVariables:variables escaper:escaper]) {
