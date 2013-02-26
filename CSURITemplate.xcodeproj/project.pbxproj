@@ -16,6 +16,13 @@
 		BE84572A16DCC1BE00DFD1C0 /* libCSURITemplate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE84571116DCC1BE00DFD1C0 /* libCSURITemplate.a */; };
 		BE84573016DCC1BF00DFD1C0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BE84572E16DCC1BF00DFD1C0 /* InfoPlist.strings */; };
 		BE84573316DCC1BF00DFD1C0 /* CSURITemplateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BE84573216DCC1BF00DFD1C0 /* CSURITemplateTests.m */; };
+		BE84574516DCC8B000DFD1C0 /* extended-tests.json in Resources */ = {isa = PBXBuildFile; fileRef = BE84573E16DCC8B000DFD1C0 /* extended-tests.json */; };
+		BE84574616DCC8B000DFD1C0 /* json2xml.xslt in Resources */ = {isa = PBXBuildFile; fileRef = BE84573F16DCC8B000DFD1C0 /* json2xml.xslt */; };
+		BE84574716DCC8B000DFD1C0 /* negative-tests.json in Resources */ = {isa = PBXBuildFile; fileRef = BE84574016DCC8B000DFD1C0 /* negative-tests.json */; };
+		BE84574816DCC8B000DFD1C0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = BE84574116DCC8B000DFD1C0 /* README.md */; };
+		BE84574916DCC8B000DFD1C0 /* spec-examples-by-section.json in Resources */ = {isa = PBXBuildFile; fileRef = BE84574216DCC8B000DFD1C0 /* spec-examples-by-section.json */; };
+		BE84574A16DCC8B000DFD1C0 /* spec-examples.json in Resources */ = {isa = PBXBuildFile; fileRef = BE84574316DCC8B000DFD1C0 /* spec-examples.json */; };
+		BE84574B16DCC8B000DFD1C0 /* transform-json-tests.xslt in Resources */ = {isa = PBXBuildFile; fileRef = BE84574416DCC8B000DFD1C0 /* transform-json-tests.xslt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,8 +59,14 @@
 		BE84572516DCC1BE00DFD1C0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		BE84572D16DCC1BF00DFD1C0 /* CSURITemplateTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CSURITemplateTests-Info.plist"; sourceTree = "<group>"; };
 		BE84572F16DCC1BF00DFD1C0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		BE84573116DCC1BF00DFD1C0 /* CSURITemplateTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CSURITemplateTests.h; sourceTree = "<group>"; };
 		BE84573216DCC1BF00DFD1C0 /* CSURITemplateTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CSURITemplateTests.m; sourceTree = "<group>"; };
+		BE84573E16DCC8B000DFD1C0 /* extended-tests.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "extended-tests.json"; sourceTree = "<group>"; };
+		BE84573F16DCC8B000DFD1C0 /* json2xml.xslt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = json2xml.xslt; sourceTree = "<group>"; };
+		BE84574016DCC8B000DFD1C0 /* negative-tests.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "negative-tests.json"; sourceTree = "<group>"; };
+		BE84574116DCC8B000DFD1C0 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		BE84574216DCC8B000DFD1C0 /* spec-examples-by-section.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spec-examples-by-section.json"; sourceTree = "<group>"; };
+		BE84574316DCC8B000DFD1C0 /* spec-examples.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spec-examples.json"; sourceTree = "<group>"; };
+		BE84574416DCC8B000DFD1C0 /* transform-json-tests.xslt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "transform-json-tests.xslt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,7 +142,7 @@
 		BE84572B16DCC1BF00DFD1C0 /* CSURITemplateTests */ = {
 			isa = PBXGroup;
 			children = (
-				BE84573116DCC1BF00DFD1C0 /* CSURITemplateTests.h */,
+				BE84573D16DCC8B000DFD1C0 /* uritemplate-test */,
 				BE84573216DCC1BF00DFD1C0 /* CSURITemplateTests.m */,
 				BE84572C16DCC1BF00DFD1C0 /* Supporting Files */,
 			);
@@ -143,6 +156,20 @@
 				BE84572E16DCC1BF00DFD1C0 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		BE84573D16DCC8B000DFD1C0 /* uritemplate-test */ = {
+			isa = PBXGroup;
+			children = (
+				BE84573E16DCC8B000DFD1C0 /* extended-tests.json */,
+				BE84573F16DCC8B000DFD1C0 /* json2xml.xslt */,
+				BE84574016DCC8B000DFD1C0 /* negative-tests.json */,
+				BE84574116DCC8B000DFD1C0 /* README.md */,
+				BE84574216DCC8B000DFD1C0 /* spec-examples-by-section.json */,
+				BE84574316DCC8B000DFD1C0 /* spec-examples.json */,
+				BE84574416DCC8B000DFD1C0 /* transform-json-tests.xslt */,
+			);
+			path = "uritemplate-test";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,6 +244,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE84573016DCC1BF00DFD1C0 /* InfoPlist.strings in Resources */,
+				BE84574516DCC8B000DFD1C0 /* extended-tests.json in Resources */,
+				BE84574616DCC8B000DFD1C0 /* json2xml.xslt in Resources */,
+				BE84574716DCC8B000DFD1C0 /* negative-tests.json in Resources */,
+				BE84574816DCC8B000DFD1C0 /* README.md in Resources */,
+				BE84574916DCC8B000DFD1C0 /* spec-examples-by-section.json in Resources */,
+				BE84574A16DCC8B000DFD1C0 /* spec-examples.json in Resources */,
+				BE84574B16DCC8B000DFD1C0 /* transform-json-tests.xslt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +437,7 @@
 				BE84573816DCC1BF00DFD1C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		BE84573916DCC1BF00DFD1C0 /* Build configuration list for PBXNativeTarget "CSURITemplateTests" */ = {
 			isa = XCConfigurationList;
@@ -411,6 +446,7 @@
 				BE84573B16DCC1BF00DFD1C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

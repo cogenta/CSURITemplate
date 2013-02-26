@@ -10,4 +10,7 @@
 
 @interface CSURITemplate : NSObject
 
+- (id)initWithURITemplate:(NSString *)URITemplate;
+- (NSString *)URIWithVariables:(NSDictionary *)variables;
+
 @end
