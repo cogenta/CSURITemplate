@@ -98,9 +98,9 @@ dataForTest(NSString *testFile, NSError **error)
 }
 
 NSDictionary *
-objectForTest(NSString *testName, NSError **error)
+objectForSpecFilename(NSString *specFilename, NSError **error)
 {
-    NSData *data = dataForTest(testName, error);
+    NSData *data = dataForTest(specFilename, error);
     if ( ! data) {
         return nil;
     }
@@ -126,10 +126,10 @@ objectForTest(NSString *testName, NSError **error)
     [super tearDown];
 }
 
-- (void)testSpecExamplesBySection
+- (void)executeSpecFilename:(NSString *)specFilename
 {
     NSError *error = nil;
-    NSDictionary *spec = objectForTest(@"spec-examples-by-section.json", &error);
+    NSDictionary *spec = objectForSpecFilename(specFilename, &error);
     STAssertNil(error, @"%@", error);
     STAssertTrue([spec isKindOfClass:[NSDictionary class]],
                  @"The test spec should be a JSON object.");
@@ -152,11 +152,21 @@ objectForTest(NSString *testName, NSError **error)
             NSString *actualResult = [template URIWithVariables:variables];
             if ( ! [expectation matchesURI:actualResult]) {
                 STFail(@"%@", [expectation failureMessageWithTemplate:URITemplate
-                                                  actualResult:actualResult]);
+                                                         actualResult:actualResult]);
             }
         }
         
     }];
+}
+
+- (void)testSpecExamplesBySection
+{
+    [self executeSpecFilename:@"spec-examples-by-section.json"];
+}
+
+- (void)testSpecExamples
+{
+    [self executeSpecFilename:@"spec-examples.json"];
 }
 
 @end
