@@ -1,0 +1,418 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BE84571516DCC1BE00DFD1C0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE84571416DCC1BE00DFD1C0 /* Foundation.framework */; };
+		BE84571A16DCC1BE00DFD1C0 /* CSURITemplate.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = BE84571916DCC1BE00DFD1C0 /* CSURITemplate.h */; };
+		BE84571C16DCC1BE00DFD1C0 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = BE84571B16DCC1BE00DFD1C0 /* CSURITemplate.m */; };
+		BE84572416DCC1BE00DFD1C0 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE84572316DCC1BE00DFD1C0 /* SenTestingKit.framework */; };
+		BE84572616DCC1BE00DFD1C0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE84572516DCC1BE00DFD1C0 /* UIKit.framework */; };
+		BE84572716DCC1BE00DFD1C0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE84571416DCC1BE00DFD1C0 /* Foundation.framework */; };
+		BE84572A16DCC1BE00DFD1C0 /* libCSURITemplate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE84571116DCC1BE00DFD1C0 /* libCSURITemplate.a */; };
+		BE84573016DCC1BF00DFD1C0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BE84572E16DCC1BF00DFD1C0 /* InfoPlist.strings */; };
+		BE84573316DCC1BF00DFD1C0 /* CSURITemplateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BE84573216DCC1BF00DFD1C0 /* CSURITemplateTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BE84572816DCC1BE00DFD1C0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BE84570916DCC1BE00DFD1C0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE84571016DCC1BE00DFD1C0;
+			remoteInfo = CSURITemplate;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BE84570F16DCC1BE00DFD1C0 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/${PRODUCT_NAME}";
+			dstSubfolderSpec = 16;
+			files = (
+				BE84571A16DCC1BE00DFD1C0 /* CSURITemplate.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BE84571116DCC1BE00DFD1C0 /* libCSURITemplate.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCSURITemplate.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE84571416DCC1BE00DFD1C0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BE84571816DCC1BE00DFD1C0 /* CSURITemplate-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CSURITemplate-Prefix.pch"; sourceTree = "<group>"; };
+		BE84571916DCC1BE00DFD1C0 /* CSURITemplate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CSURITemplate.h; sourceTree = "<group>"; };
+		BE84571B16DCC1BE00DFD1C0 /* CSURITemplate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CSURITemplate.m; sourceTree = "<group>"; };
+		BE84572216DCC1BE00DFD1C0 /* CSURITemplateTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CSURITemplateTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE84572316DCC1BE00DFD1C0 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		BE84572516DCC1BE00DFD1C0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		BE84572D16DCC1BF00DFD1C0 /* CSURITemplateTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CSURITemplateTests-Info.plist"; sourceTree = "<group>"; };
+		BE84572F16DCC1BF00DFD1C0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		BE84573116DCC1BF00DFD1C0 /* CSURITemplateTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CSURITemplateTests.h; sourceTree = "<group>"; };
+		BE84573216DCC1BF00DFD1C0 /* CSURITemplateTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CSURITemplateTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BE84570E16DCC1BE00DFD1C0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE84571516DCC1BE00DFD1C0 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE84571E16DCC1BE00DFD1C0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE84572416DCC1BE00DFD1C0 /* SenTestingKit.framework in Frameworks */,
+				BE84572616DCC1BE00DFD1C0 /* UIKit.framework in Frameworks */,
+				BE84572716DCC1BE00DFD1C0 /* Foundation.framework in Frameworks */,
+				BE84572A16DCC1BE00DFD1C0 /* libCSURITemplate.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BE84570816DCC1BE00DFD1C0 = {
+			isa = PBXGroup;
+			children = (
+				BE84571616DCC1BE00DFD1C0 /* CSURITemplate */,
+				BE84572B16DCC1BF00DFD1C0 /* CSURITemplateTests */,
+				BE84571316DCC1BE00DFD1C0 /* Frameworks */,
+				BE84571216DCC1BE00DFD1C0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BE84571216DCC1BE00DFD1C0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BE84571116DCC1BE00DFD1C0 /* libCSURITemplate.a */,
+				BE84572216DCC1BE00DFD1C0 /* CSURITemplateTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BE84571316DCC1BE00DFD1C0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BE84571416DCC1BE00DFD1C0 /* Foundation.framework */,
+				BE84572316DCC1BE00DFD1C0 /* SenTestingKit.framework */,
+				BE84572516DCC1BE00DFD1C0 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BE84571616DCC1BE00DFD1C0 /* CSURITemplate */ = {
+			isa = PBXGroup;
+			children = (
+				BE84571916DCC1BE00DFD1C0 /* CSURITemplate.h */,
+				BE84571B16DCC1BE00DFD1C0 /* CSURITemplate.m */,
+				BE84571716DCC1BE00DFD1C0 /* Supporting Files */,
+			);
+			path = CSURITemplate;
+			sourceTree = "<group>";
+		};
+		BE84571716DCC1BE00DFD1C0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BE84571816DCC1BE00DFD1C0 /* CSURITemplate-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		BE84572B16DCC1BF00DFD1C0 /* CSURITemplateTests */ = {
+			isa = PBXGroup;
+			children = (
+				BE84573116DCC1BF00DFD1C0 /* CSURITemplateTests.h */,
+				BE84573216DCC1BF00DFD1C0 /* CSURITemplateTests.m */,
+				BE84572C16DCC1BF00DFD1C0 /* Supporting Files */,
+			);
+			path = CSURITemplateTests;
+			sourceTree = "<group>";
+		};
+		BE84572C16DCC1BF00DFD1C0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BE84572D16DCC1BF00DFD1C0 /* CSURITemplateTests-Info.plist */,
+				BE84572E16DCC1BF00DFD1C0 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BE84571016DCC1BE00DFD1C0 /* CSURITemplate */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE84573616DCC1BF00DFD1C0 /* Build configuration list for PBXNativeTarget "CSURITemplate" */;
+			buildPhases = (
+				BE84570D16DCC1BE00DFD1C0 /* Sources */,
+				BE84570E16DCC1BE00DFD1C0 /* Frameworks */,
+				BE84570F16DCC1BE00DFD1C0 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CSURITemplate;
+			productName = CSURITemplate;
+			productReference = BE84571116DCC1BE00DFD1C0 /* libCSURITemplate.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		BE84572116DCC1BE00DFD1C0 /* CSURITemplateTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE84573916DCC1BF00DFD1C0 /* Build configuration list for PBXNativeTarget "CSURITemplateTests" */;
+			buildPhases = (
+				BE84571D16DCC1BE00DFD1C0 /* Sources */,
+				BE84571E16DCC1BE00DFD1C0 /* Frameworks */,
+				BE84571F16DCC1BE00DFD1C0 /* Resources */,
+				BE84572016DCC1BE00DFD1C0 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BE84572916DCC1BE00DFD1C0 /* PBXTargetDependency */,
+			);
+			name = CSURITemplateTests;
+			productName = CSURITemplateTests;
+			productReference = BE84572216DCC1BE00DFD1C0 /* CSURITemplateTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BE84570916DCC1BE00DFD1C0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Cogenta Systems Ltd";
+			};
+			buildConfigurationList = BE84570C16DCC1BE00DFD1C0 /* Build configuration list for PBXProject "CSURITemplate" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BE84570816DCC1BE00DFD1C0;
+			productRefGroup = BE84571216DCC1BE00DFD1C0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BE84571016DCC1BE00DFD1C0 /* CSURITemplate */,
+				BE84572116DCC1BE00DFD1C0 /* CSURITemplateTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BE84571F16DCC1BE00DFD1C0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE84573016DCC1BF00DFD1C0 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BE84572016DCC1BE00DFD1C0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BE84570D16DCC1BE00DFD1C0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE84571C16DCC1BE00DFD1C0 /* CSURITemplate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE84571D16DCC1BE00DFD1C0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE84573316DCC1BF00DFD1C0 /* CSURITemplateTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BE84572916DCC1BE00DFD1C0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE84571016DCC1BE00DFD1C0 /* CSURITemplate */;
+			targetProxy = BE84572816DCC1BE00DFD1C0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		BE84572E16DCC1BF00DFD1C0 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BE84572F16DCC1BF00DFD1C0 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		BE84573416DCC1BF00DFD1C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		BE84573516DCC1BF00DFD1C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BE84573716DCC1BF00DFD1C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/CSURITemplate.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CSURITemplate/CSURITemplate-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		BE84573816DCC1BF00DFD1C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/CSURITemplate.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CSURITemplate/CSURITemplate-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		BE84573A16DCC1BF00DFD1C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CSURITemplate/CSURITemplate-Prefix.pch";
+				INFOPLIST_FILE = "CSURITemplateTests/CSURITemplateTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		BE84573B16DCC1BF00DFD1C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CSURITemplate/CSURITemplate-Prefix.pch";
+				INFOPLIST_FILE = "CSURITemplateTests/CSURITemplateTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BE84570C16DCC1BE00DFD1C0 /* Build configuration list for PBXProject "CSURITemplate" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE84573416DCC1BF00DFD1C0 /* Debug */,
+				BE84573516DCC1BF00DFD1C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BE84573616DCC1BF00DFD1C0 /* Build configuration list for PBXNativeTarget "CSURITemplate" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE84573716DCC1BF00DFD1C0 /* Debug */,
+				BE84573816DCC1BF00DFD1C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		BE84573916DCC1BF00DFD1C0 /* Build configuration list for PBXNativeTarget "CSURITemplateTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE84573A16DCC1BF00DFD1C0 /* Debug */,
+				BE84573B16DCC1BF00DFD1C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BE84570916DCC1BE00DFD1C0 /* Project object */;
+}
