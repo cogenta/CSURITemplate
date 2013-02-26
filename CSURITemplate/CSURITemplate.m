@@ -612,9 +612,18 @@
                                 escaper:(SEL)escaper
                                   block:(void (^)(NSString *key, NSString *value))block
 {
-    for (NSString *value in [self valuesWithVariables:variables escaper:escaper]) {
-        block(key, value);
+    id value = [variables objectForKey:key];
+    if ( ! value || (NSNull *) value == [NSNull null]) {
+        return;
     }
+    
+    if ([value isEqual:@[]]) {
+        block(key, @"");
+        return;
+    }
+    
+    NSString *escaped = [value escapeWithEscaper:escaper];
+    block(key, escaped);
 }
 
 

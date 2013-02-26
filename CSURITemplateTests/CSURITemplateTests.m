@@ -112,20 +112,6 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
 
 @implementation CSURITemplateTests
 
-- (void)setUp
-{
-    [super setUp];
-    
-    // Set-up code here.
-}
-
-- (void)tearDown
-{
-    // Tear-down code here.
-    
-    [super tearDown];
-}
-
 - (void)executeSpecFilename:(NSString *)specFilename
 {
     NSError *error = nil;
@@ -167,6 +153,11 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
 - (void)testSpecExamples
 {
     [self executeSpecFilename:@"spec-examples.json"];
+}
+
+- (void)testExtendedTests
+{
+    [self executeSpecFilename:@"extended-tests.json"];
 }
 
 @end
