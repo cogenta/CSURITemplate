@@ -66,8 +66,6 @@
 - (NSString *)stringEscapedForFragment;
 - (NSString *)basicString;
 - (NSArray *)explodedItems;
-- (NSArray *)explodedItemsEscapedForURI;
-- (NSArray *)explodedItemsEscapedForFragment;
 - (NSArray *)explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper;
 - (NSString *)escapeWithEscaper:(id<CSURITemplateEscaper>)escaper;
 - (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
@@ -138,16 +136,6 @@
     }
 }
 
-
-- (NSArray *)explodedItemsEscapedForURI
-{
-    return [self explodedItemsEscapedWithEscaper:[CSURITemplateEscaping uriEscaper]];
-}
-
-- (NSArray *)explodedItemsEscapedForFragment
-{
-    return [self explodedItemsEscapedWithEscaper:[CSURITemplateEscaping fragmentEscaper]];
-}
 
 @end
 
