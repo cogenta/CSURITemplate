@@ -38,7 +38,7 @@
 {
     return [NSString stringWithFormat:
             @"%@ expands to '%@' instead of '%@'",
-            template, result, self];
+            [template description], [result description], [self description]];
 }
 
 @end
@@ -63,6 +63,33 @@
             [template description], [result description], [self description]];
 }
 
+
+@end
+
+@implementation NSNumber (CSURITemplateTestsAdditions)
+
+- (BOOL)matchesURI:(NSString *)actualURI
+{
+    if ([self boolValue]) {
+        return NO;
+    }
+    
+    return actualURI == nil;
+}
+
+- (NSString *)failureMessageWithTemplate:(NSString *)template
+                            actualResult:(NSString *)result
+{
+    if ([self boolValue]) {
+        return [NSString stringWithFormat:
+                @"Expected result for %@ was a number (%@) but not false",
+                [template description], [self description]];
+    }
+    
+    return [NSString stringWithFormat:
+            @"Expected error for %@ but got %@",
+            [template description], [result description]];
+}
 
 @end
 
@@ -159,5 +186,11 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
 {
     [self executeSpecFilename:@"extended-tests.json"];
 }
+
+- (void)testNegativeTests
+{
+    [self executeSpecFilename:@"negative-tests.json"];
+}
+
 
 @end

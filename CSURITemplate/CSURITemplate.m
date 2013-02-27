@@ -71,6 +71,8 @@
 - (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)key
                                            block:(void (^)(NSString *key, NSString *value))block;
+- (BOOL)isInvalidForPrefixVariable;
+
 @end
 
 @implementation CSURITemplateURIEscaper
@@ -136,6 +138,10 @@
     }
 }
 
+- (BOOL)isInvalidForPrefixVariable
+{
+    return YES;
+}
 
 @end
 
@@ -164,6 +170,11 @@
 - (NSString *)basicString
 {
     return self;
+}
+
+- (BOOL)isInvalidForPrefixVariable
+{
+    return NO;
 }
 
 @end
@@ -352,8 +363,14 @@
     BOOL isFirst = YES;
     NSMutableString *result = [NSMutableString string];
     for (NSObject<CSURITemplateVariable> *variable in variablesExpression) {
-        for (NSString *value in [variable valuesWithVariables:variables
-                                                      escaper:[self escaper]]) {
+        NSArray *values = [variable valuesWithVariables:variables
+                                                escaper:[self escaper]];
+        if ( ! values) {
+            // An error was encountered expanding the variable.
+            return nil;
+        }
+        
+        for (NSString *value in values) {
             if (isFirst) {
                 isFirst = NO;
                 [result appendString:[self prepend]];
@@ -512,11 +529,18 @@
 {
     __block BOOL isFirst = YES;
     NSMutableString *result = [NSMutableString string];
+    __block BOOL hasError = NO;
     for (NSObject<CSURITemplateVariable> *variable in variablesExpression) {
         [variable enumerateKeyValuesWithVariables:variables
                                           escaper:[self escaper]
                                             block:^(NSString *k, NSString *v)
         {
+            if ( ! k && ! v) {
+                // An error ocurred enumerating key values.
+                hasError = YES;
+                return;
+            }
+            
             if (isFirst) {
                 isFirst = NO;
                 [result appendString:[self prepend]];
@@ -528,6 +552,10 @@
             [result appendString:@"="];
             [result appendString:v];
         }];
+    }
+    
+    if (hasError) {
+        return nil;
     }
     
     return [NSString stringWithString:result];
@@ -563,11 +591,18 @@
 - (NSString *)expandWithVariables:(NSDictionary *)variables
 {
     NSMutableString *result = [NSMutableString string];
+    __block BOOL hasError = NO;
     for (NSObject<CSURITemplateVariable> *variable in variablesExpression) {
         [variable enumerateKeyValuesWithVariables:variables
                                           escaper:[self escaper]
                                             block:^(NSString *k, NSString *v)
          {
+             if ( ! k && ! v) {
+                 // An error ocurred enumerating key values.
+                 hasError = YES;
+                 return;
+             }
+             
              [result appendString:@";"];
              
              [result appendString:k];
@@ -577,6 +612,10 @@
                  [result appendString:v];
              }
          }];
+    }
+    
+    if (hasError) {
+        return nil;
     }
     
     return [NSString stringWithString:result];
@@ -747,6 +786,12 @@
 - (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper
 {
     id value = [variables objectForKey:key];
+    
+    if ([value isInvalidForPrefixVariable]) {
+        // Only simple strings may be prefixed.
+        return nil;
+    }
+    
     if ( ! value || (NSNull *) value == [NSNull null]) {
         return [NSArray array];
     }
@@ -766,7 +811,14 @@
                                 escaper:(id<CSURITemplateEscaper>)escaper
                                   block:(void (^)(NSString *key, NSString *value))block
 {
-    for (NSString *value in [self valuesWithVariables:variables escaper:escaper]) {
+    NSArray *values = [self valuesWithVariables:variables escaper:escaper];
+    if ( ! values) {
+        // An error was encountered expanding the variables.
+        block(nil, nil);
+        return;
+    }
+    
+    for (NSString *value in values) {
         block(key, value);
     }
 }
@@ -779,6 +831,7 @@
 
 @property (nonatomic, strong) NSString *URITemplate;
 @property (nonatomic, strong) NSMutableArray *terms;
+@property (readonly) BOOL hasError;
 
 @end
 
@@ -786,6 +839,7 @@
 
 @synthesize URITemplate;
 @synthesize terms;
+@synthesize hasError;
 
 - (id)initWithURITemplate:(NSString *)aURITemplate
 {
@@ -797,31 +851,62 @@
     return self;
 }
 
-- (id)variableWithVarspec:(NSString *)varspec
+- (NSObject<CSURITemplateVariable> *)variableWithVarspec:(NSString *)varspec
 {
+    if ([varspec rangeOfString:@"$"].location != NSNotFound) {
+        // Varspec contains a forbidden character.
+        return nil;
+    }
+    NSMutableCharacterSet *varchars = [NSMutableCharacterSet alphanumericCharacterSet];
+    [varchars addCharactersInString:@"._%"];
+                                
     NSCharacterSet *modifierStartCharacters = [NSCharacterSet characterSetWithCharactersInString:@":*"];
     NSScanner *scanner = [NSScanner scannerWithString:varspec];
     [scanner setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
     NSString *key = nil;
-    [scanner scanUpToCharactersFromSet:modifierStartCharacters intoString:&key];
+    [scanner scanCharactersFromSet:varchars intoString:&key];
     
     NSString *modifierStart = nil;
     [scanner scanCharactersFromSet:modifierStartCharacters intoString:&modifierStart];
+    
     if ([modifierStart isEqualToString:@"*"]) {
+        // Modifier is explode.
+
+        if ( ! [scanner isAtEnd]) {
+            // There were extra characters after the explode modifier.
+            return nil;
+        }
+        
         return [[CSURITemplateExplodedVariable alloc] initWithKey:key];
     } else if ([modifierStart isEqualToString:@":"]) {
-        // modifier is prefix
+        // Modifier is prefix.
         NSCharacterSet *oneToNine = [NSCharacterSet characterSetWithCharactersInString:@"123456789"];
         NSCharacterSet *zeroToNine = [NSCharacterSet decimalDigitCharacterSet];
         NSString *firstDigit = @"";
-        [scanner scanCharactersFromSet:oneToNine intoString:&firstDigit];
+        if ( ! [scanner scanCharactersFromSet:oneToNine intoString:&firstDigit]) {
+            // The max-chars does not start with a valid digit.
+            return nil;
+        }
         NSString *restDigits = @"";
         [scanner scanCharactersFromSet:zeroToNine intoString:&restDigits];
         NSString *digits = [firstDigit stringByAppendingString:restDigits];
+        
+        if ( ! [scanner isAtEnd]) {
+            // The max-chars is not entirely digits.
+            return nil;
+        }
+
         NSUInteger maxLength = [digits integerValue];
         return [[CSURITemplatePrefixedVariable alloc] initWithKey:key
                                                         maxLength:maxLength];
     } else {
+        // No modifier.
+        
+        if ( ! [scanner isAtEnd]) {
+            // There were extra characters after the key.
+            return nil;
+        }
+        
         return [[CSURITemplateUnmodifiedVariable alloc] initWithKey:key];
     }
     
@@ -838,7 +923,12 @@
         NSString *varspec = nil;
         [scanner scanUpToString:@"," intoString:&varspec];
         [scanner scanString:@"," intoString:NULL];
-        [variables addObject:[self variableWithVarspec:varspec]];
+        NSObject<CSURITemplateVariable> *variable = [self variableWithVarspec:varspec];
+        if ( ! variable) {
+            // An error was encountered parsing the varspec.
+            return nil;
+        }
+        [variables addObject:variable];
     }
     return variables;
 }
@@ -846,7 +936,16 @@
 - (NSObject<CSURITemplateTerm> *)termWithOperator:(NSString *)operator
                                      variableList:(NSString *)variableList
 {
+    if ([operator length] > 1) {
+        // The term has an invalid operator.
+        return nil;
+    }
+    
     NSArray *variables = [self variablesWithVariableList:variableList];
+    if ( ! variables) {
+        // An error was encountered parsing a variable.
+        return nil;
+    }
     
     if ([operator isEqualToString:@"/"]) {
         return [[CSURITemplateSolidusExpressionTerm alloc] initWithVariables:variables];
@@ -862,8 +961,11 @@
         return [[CSURITemplateReservedExpressionTerm alloc] initWithVariables:variables];
     } else if ([operator isEqualToString:@"&"]) {
         return [[CSURITemplateQueryContinuationExpressionTerm alloc] initWithVariables:variables];
-    } else {
+    } else if ( ! operator) {
         return [[CSURITemplateCommaExpressionTerm alloc] initWithVariables:variables];
+    } else {
+        // The operator is unknown or reserved.
+        return nil;
     }
 }
 
@@ -881,7 +983,7 @@
 
 - (void)loadTerms
 {
-    if (terms) {
+    if (terms || hasError) {
         return;
     }
     
@@ -890,18 +992,40 @@
     NSScanner *scanner = [NSScanner scannerWithString:URITemplate];
     [scanner setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
     while ( ! [scanner isAtEnd]) {
+        NSCharacterSet *curlyBrackets = [NSCharacterSet
+                                         characterSetWithCharactersInString:@"{}"];
         NSString *literal = nil;
-        if ([scanner scanUpToString:@"{" intoString:&literal]) {
+        if ([scanner scanUpToCharactersFromSet:curlyBrackets
+                                    intoString:&literal]) {
             CSURITemplateLiteralTerm *term = [[CSURITemplateLiteralTerm alloc]
                                                  initWithLiteral:literal];
             [terms addObject:term];
         }
         
-        [scanner scanString:@"{" intoString:NULL];
+        NSString *curlyBracket = nil;
+        [scanner scanCharactersFromSet:curlyBrackets intoString:&curlyBracket];
+        if ([curlyBracket isEqualToString:@"}"]) {
+            // An expression was closed but not opened.
+            hasError = YES;
+            return;
+        }
+        
         NSString *expression = nil;
-        if ([scanner scanUpToString:@"}" intoString:&expression]
-            && [scanner scanString:@"}" intoString:NULL]) {
-            [terms addObject:[self termWithExpression:expression]];
+        if ([scanner scanUpToString:@"}" intoString:&expression]) {
+            if ( ! [scanner scanString:@"}" intoString:NULL]) {
+                // An expression was opened not closed.
+                hasError = YES;
+                return;
+            }
+            
+            NSObject<CSURITemplateTerm> *term = [self termWithExpression:expression];
+            if ( ! term) {
+                // An error was encountered parsing the term expression.
+                hasError = YES;
+                return;
+            }
+            
+            [terms addObject:term];
         }
     }
 }
@@ -909,9 +1033,20 @@
 - (NSString *)URIWithVariables:(NSDictionary *)variables
 {
     [self loadTerms];
+    if (hasError) {
+        // An error was encountered parsing the template.
+        return nil;
+    }
+    
     NSMutableString *result = [NSMutableString string];
     for (NSObject<CSURITemplateTerm> *term in terms) {
-        [result appendString:[term expandWithVariables:variables]];
+        NSString *value = [term expandWithVariables:variables];
+        if ( ! value) {
+            // An error was encountered expanding the term.
+            hasError = YES;
+            return nil;
+        }
+        [result appendString:value];
     }
     return [NSString stringWithString:result];
 }
