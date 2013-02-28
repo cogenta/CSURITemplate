@@ -67,6 +67,7 @@
 		BE84574216DCC8B000DFD1C0 /* spec-examples-by-section.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spec-examples-by-section.json"; sourceTree = "<group>"; };
 		BE84574316DCC8B000DFD1C0 /* spec-examples.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spec-examples.json"; sourceTree = "<group>"; };
 		BE84574416DCC8B000DFD1C0 /* transform-json-tests.xslt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "transform-json-tests.xslt"; sourceTree = "<group>"; };
+		BE84576616DF64AB00DFD1C0 /* CSURITemplate.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; fileEncoding = 4; path = CSURITemplate.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +100,7 @@
 				BE84572B16DCC1BF00DFD1C0 /* CSURITemplateTests */,
 				BE84571316DCC1BE00DFD1C0 /* Frameworks */,
 				BE84571216DCC1BE00DFD1C0 /* Products */,
+				BE84576616DF64AB00DFD1C0 /* CSURITemplate.podspec */,
 			);
 			sourceTree = "<group>";
 		};
