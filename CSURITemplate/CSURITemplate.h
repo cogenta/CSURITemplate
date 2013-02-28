@@ -12,8 +12,8 @@
  Expand URI Templates.
  
  This class implements Level 4 of the URI Template specification, defined by
- (RFC 6570)[http://tools.ietf.org/html/rfc6570]. URI Templates are a compact
- string representation of a set of URIs.
+ [RFC6570: URI Template](http://tools.ietf.org/html/rfc6570). URI Templates are
+ a compact string representation of a set of URIs.
  
  Each CSURITemplate instance has a single URI Template. The URI template can be
  expanded into a URI reference by invoking the instance's URIWithVariables: with
