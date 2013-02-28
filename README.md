@@ -19,4 +19,4 @@ Installation
 [CocoaPods](http://cocoapods.org/) is the easiest way to use CSURITemplate.
 
     platform :ios, '6.0'
-    pod 'CSURITemplate', :git => 'https://github.com/cogenta/CSURITemplate.git'
+    pod 'CSURITemplate'
