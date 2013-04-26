@@ -1,6 +1,8 @@
 CSURITemplate
 =============
 
+[![Build Status](https://travis-ci.org/cogenta/CSURITemplate.png?branch=master)](https://travis-ci.org/cogenta/CSURITemplate)
+
 CSURITemplate is an Objective-C implementation of
 [RFC6570: URI Template](http://tools.ietf.org/html/rfc6570) up to Level 4 of
 the spec.
