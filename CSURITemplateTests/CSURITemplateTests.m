@@ -153,18 +153,18 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
         NSDictionary *variables = obj[@"variables"];
         
         for (NSArray *testCase in obj[@"testcases"]) {
-            NSString *URITemplate = testCase[0];
-            CSURITemplate *template = [[CSURITemplate alloc]
-                                       initWithURITemplate:URITemplate];
+            NSString *templateString = testCase[0];
+            CSURITemplate *template = [CSURITemplate URITemplateWithString:templateString error:nil];
             
-            if ([URITemplate isEqualToString:@"{?keys*}"]) {
+            if ([templateString isEqualToString:@"{?keys*}"]) {
                 NSLog(@"DEBUG");
             }
             
             id expectation = testCase[1];
-            NSString *actualResult = [template URIWithVariables:variables];
+            NSError *error = nil;
+            NSString *actualResult = [template relativeStringWithVariables:variables error:&error];
             if ( ! [expectation matchesURI:actualResult]) {
-                STFail(@"%@", [expectation failureMessageWithTemplate:URITemplate
+                STFail(@"%@", [expectation failureMessageWithTemplate:templateString
                                                          actualResult:actualResult]);
             }
         }
@@ -192,5 +192,119 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
     [self executeSpecFilename:@"negative-tests.json"];
 }
 
+#pragma mark - Parsing Errors
+
+- (void)testErrorIsReturnedOnAttemptToParseTemplateWithUnclosedCurlyBrace
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{invalid" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorExpressionOpenedButNeverClosed, error.code, nil);
+    STAssertEqualObjects(@"An expression was opened but never closed.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"An opening '{' character was never terminated by  '{' character.", [error localizedFailureReason], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToParseTemplateWithClosedBraceThatWasNotOpened
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"invalid}" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorExpressionClosedButNeverOpened, error.code, nil);
+    STAssertEqualObjects(@"An expression was closed that was never opened.",[error localizedDescription], nil);
+    STAssertEqualObjects(@"A closing '}' character was encountered that was not preceeded by an opening '{' character.", [error localizedFailureReason], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToParseVariableWithInvalidOperator
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{++var}" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorInvalidOperator, error.code, nil);
+    STAssertEqualObjects(@"An invalid operator was encountered.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"An operator was encountered with a length greater than 1 character ('++').", [error localizedFailureReason], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToParseVariableWithUnknownOperator
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{^whatever}" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorInvalidVariableKey, error.code, nil);
+    STAssertEqualObjects(@"The template contains an invalid variable key.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"The variable key '^whatever' is invalid.", [error localizedFailureReason], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToParseVariableWithTrailingCharactersAfterExplodeModifier
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{whatever*fdfsdf}" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorInvalidVariableModifier, error.code, nil);
+    STAssertEqualObjects(@"The template contains an invalid variable modifier.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"Extra characters were found after the explode modifier ('*') for the variable 'whatever'.", [error localizedFailureReason], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToParseVariableWithLeadingZeroForMaximumLengthModifier
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{var:0123}" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorInvalidVariableModifier, error.code, nil);
+    STAssertEqualObjects(@"The template contains an invalid variable modifier.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"The variable 'var' was followed by the maximum length modifier (':'), but the maximum length argument was prefixed with an invalid character.", [error localizedFailureReason], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToParseVariableWithNonNumericValueForMaximumLengthModifier
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{var:3af}" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorInvalidVariableModifier, error.code, nil);
+    STAssertEqualObjects(@"The template contains an invalid variable modifier.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"The variable 'var' was followed by the maximum length modifier (':'), but the maximum length argument is not numeric.", [error localizedFailureReason], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToParseVariableWithInvalidVariableKey
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{var-name}" error:&error];
+    STAssertNil(URITemplate, nil);
+    STAssertNotNil(error, nil);
+    STAssertEquals(CSURITemplateErrorInvalidVariableKey, error.code, nil);
+    STAssertEqualObjects(@"The template contains an invalid variable key.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"The variable key 'var-name' is invalid.", [error localizedFailureReason], nil);
+}
+
+#pragma mark Expansion Errors
+
+- (void)testErrorIsReturnedOnAttemptToExpandVariableWithMaximumLengthModifierWithNonStringValue
+{
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{variable}" error:&error];
+    STAssertNotNil(URITemplate, nil);
+    NSString *expandedString = [URITemplate relativeStringWithVariables:nil error:&error];
+    STAssertNil(expandedString, nil);
+    STAssertEquals(CSURITemplateErrorNoVariables, error.code, nil);
+    STAssertEqualObjects(@"A template cannot be expanded without a dictionary of variables.", [error localizedDescription], nil);
+}
+
+- (void)testErrorIsReturnedOnAttemptToExpandVariableWithMaximumLengthModifierUsingValueThatIsNotAString {
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{variable:5}" error:&error];
+    STAssertNotNil(URITemplate, nil);
+    NSDictionary *variables = @{ @"variable": @[ @"one", @"two" ] };
+    NSString *expandedString = [URITemplate relativeStringWithVariables:variables error:&error];
+    STAssertNil(expandedString, nil);
+    STAssertEquals(CSURITemplateErrorInvalidExpansionValue, error.code, nil);
+    STAssertEqualObjects(@"An unexpandable value was given for a template variable.", [error localizedDescription], nil);
+    STAssertEqualObjects(@"Variables with a maximum length modifier can only be expanded with string values, but a value of type '__NSArrayI' given.", [error localizedFailureReason], nil);
+}
 
 @end
