@@ -202,7 +202,7 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
     STAssertNotNil(error, nil);
     STAssertEquals(CSURITemplateErrorExpressionOpenedButNeverClosed, error.code, nil);
     STAssertEqualObjects(@"An expression was opened but never closed.", [error localizedDescription], nil);
-    STAssertEqualObjects(@"An opening '{' character was never terminated by  '{' character.", [error localizedFailureReason], nil);
+    STAssertEqualObjects(@"An opening '{' character was never terminated by  '}' character.", [error localizedFailureReason], nil);
 }
 
 - (void)testErrorIsReturnedOnAttemptToParseTemplateWithClosedBraceThatWasNotOpened

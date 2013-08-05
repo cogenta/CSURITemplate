@@ -1042,7 +1042,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
             if ( ! [scanner scanString:@"}" intoString:NULL]) {
                 // An expression was opened not closed.
                 NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"An expression was opened but never closed.", nil),
-                                            NSLocalizedFailureReasonErrorKey : NSLocalizedString(@"An opening '{' character was never terminated by  '{' character.", nil),
+                                            NSLocalizedFailureReasonErrorKey : NSLocalizedString(@"An opening '{' character was never terminated by  '}' character.", nil),
                                             CSURITemplateErrorScanLocationErrorKey: @(scanner.scanLocation) };
                 parsingError = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorExpressionOpenedButNeverClosed userInfo:userInfo];
                 break;
