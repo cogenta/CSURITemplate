@@ -9,11 +9,14 @@ the spec.
 
 Example usage:
 
-    CSURITemplate *template = [[CSURITemplate alloc]
-                               initWithURITemplate:@"{?list*}"];
-    NSDictionary *variables = @{@"list": @[@"red", @"green", @"blue"]};
-    NSString *uri = [template URIWithVariables:variables];
-    assert([uri isEqualToString:@"?list=red&list=green&list=blue"]);
+```objc
+NSError *error = nil;
+CSURITemplate *template = [CSURITemplate URITemplateWithString:@"{?list*}"
+                                                         error:&error];
+NSDictionary *variables = @{@"list": @[@"red", @"green", @"blue"]};
+NSString *uri = [template relativeStringWithVariables:variables];
+assert([uri isEqualToString:@"?list=red&list=green&list=blue"]);
+```
 
 Installation
 ------------
