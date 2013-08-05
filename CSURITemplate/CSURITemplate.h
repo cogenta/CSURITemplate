@@ -94,3 +94,8 @@ extern NSString *const CSURITemplateErrorScanLocationErrorKey;
 - (NSString *)relativeStringWithVariables:(NSDictionary *)variables error:(NSError **)error;
 
 @end
+
+@interface CSURITemplate (Deprecations)
+- (id)initWithURITemplate:(NSString *)URITemplate __attribute__((deprecated ("Use `URITemplateWithString:error:` instead")));
+- (NSString *)URIWithVariables:(NSDictionary *)variables __attribute__((deprecated ("Use `relativeStringWithVariables:error:` instead")));;
+@end
