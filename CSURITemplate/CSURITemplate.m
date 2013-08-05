@@ -1094,3 +1094,19 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 }
 
 @end
+
+@implementation CSURITemplate (Deprecations)
+
+- (id)initWithURITemplate:(NSString *)URITemplate
+{
+    self = [self initWithTemplateString:URITemplate];
+    BOOL success = [self parseTemplate:nil];
+    return success ? self : nil;
+}
+
+- (NSString *)URIWithVariables:(NSDictionary *)variables
+{
+    return [self relativeStringWithVariables:variables error:nil];
+}
+
+@end
