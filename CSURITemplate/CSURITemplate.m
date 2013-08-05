@@ -8,10 +8,12 @@
 
 #import "CSURITemplate.h"
 
+NSString *const CSURITemplateErrorDomain = @"com.cogenta.CSURITemplate.errors";
+NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 @protocol CSURITemplateTerm <NSObject>
 
-- (NSString *)expandWithVariables:(NSDictionary *)variables;
+- (NSString *)expandWithVariables:(NSDictionary *)variables error:(NSError **)error;
 
 @end
 
@@ -24,9 +26,10 @@
 @protocol CSURITemplateVariable <NSObject>
 
 @property (readonly) NSString *key;
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper;
-- (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper error:(NSError **)error;
+- (BOOL)enumerateKeyValuesWithVariables:(NSDictionary *)variables
                                 escaper:(id<CSURITemplateEscaper>)escaper
+                                  error:(NSError **)error
                                   block:(void (^)(NSString *key, NSString *value))block;
 
 @end
@@ -71,8 +74,6 @@
 - (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)key
                                            block:(void (^)(NSString *key, NSString *value))block;
-- (BOOL)isInvalidForPrefixVariable;
-
 @end
 
 @implementation CSURITemplateURIEscaper
@@ -138,11 +139,6 @@
     }
 }
 
-- (BOOL)isInvalidForPrefixVariable
-{
-    return YES;
-}
-
 @end
 
 @implementation NSString (URITemplateAdditions)
@@ -170,11 +166,6 @@
 - (NSString *)basicString
 {
     return self;
-}
-
-- (BOOL)isInvalidForPrefixVariable
-{
-    return NO;
 }
 
 @end
@@ -314,7 +305,7 @@
     return self;
 }
 
-- (NSString *)expandWithVariables:(NSDictionary *)variables
+- (NSString *)expandWithVariables:(NSDictionary *)variables error:(NSError *__autoreleasing *)error
 {
     return literal;
 }
@@ -358,13 +349,14 @@
     return @"";
 }
 
-- (NSString *)expandWithVariables:(NSDictionary *)variables
+- (NSString *)expandWithVariables:(NSDictionary *)variables error:(NSError *__autoreleasing *)error
 {
     BOOL isFirst = YES;
     NSMutableString *result = [NSMutableString string];
     for (NSObject<CSURITemplateVariable> *variable in variablesExpression) {
         NSArray *values = [variable valuesWithVariables:variables
-                                                escaper:[self escaper]];
+                                                escaper:[self escaper]
+                                                  error:error];
         if ( ! values) {
             // An error was encountered expanding the variable.
             return nil;
@@ -431,12 +423,13 @@
     return [CSURITemplateEscaping uriEscaper];
 }
 
-- (NSString *)expandWithVariables:(NSDictionary *)variables
+- (NSString *)expandWithVariables:(NSDictionary *)variables error:(NSError *__autoreleasing *)error
 {
     NSMutableString *result = [NSMutableString string];
     for (NSObject<CSURITemplateVariable> *variable in variablesExpression) {
         for (NSString *value in [variable valuesWithVariables:variables
-                                                      escaper:[self escaper]]) {
+                                                      escaper:[self escaper]
+                                                        error:error]) {
             [result appendString:[self prepend]];
             [result appendString:value];
         }
@@ -525,21 +518,15 @@
     return @"?";
 }
 
-- (NSString *)expandWithVariables:(NSDictionary *)variables
+- (NSString *)expandWithVariables:(NSDictionary *)variables error:(NSError *__autoreleasing *)error
 {
     __block BOOL isFirst = YES;
     NSMutableString *result = [NSMutableString string];
-    __block BOOL hasError = NO;
     for (NSObject<CSURITemplateVariable> *variable in variablesExpression) {
-        [variable enumerateKeyValuesWithVariables:variables
-                                          escaper:[self escaper]
-                                            block:^(NSString *k, NSString *v)
-        {
-            if ( ! k && ! v) {
-                // An error ocurred enumerating key values.
-                hasError = YES;
-                return;
-            }
+        BOOL success = [variable enumerateKeyValuesWithVariables:variables
+                                                         escaper:[self escaper]
+                                                           error:error
+                                                           block:^(NSString *key, NSString *value) {
             
             if (isFirst) {
                 isFirst = NO;
@@ -548,14 +535,12 @@
                 [result appendString:@"&"];
             }
             
-            [result appendString:k];
+            [result appendString:key];
             [result appendString:@"="];
-            [result appendString:v];
+            [result appendString:value];
         }];
-    }
-    
-    if (hasError) {
-        return nil;
+        
+        if ( ! success) return nil;
     }
     
     return [NSString stringWithString:result];
@@ -588,34 +573,22 @@
     return [CSURITemplateEscaping uriEscaper];
 }
 
-- (NSString *)expandWithVariables:(NSDictionary *)variables
+- (NSString *)expandWithVariables:(NSDictionary *)variables error:(NSError *__autoreleasing *)error
 {
     NSMutableString *result = [NSMutableString string];
-    __block BOOL hasError = NO;
     for (NSObject<CSURITemplateVariable> *variable in variablesExpression) {
-        [variable enumerateKeyValuesWithVariables:variables
-                                          escaper:[self escaper]
-                                            block:^(NSString *k, NSString *v)
-         {
-             if ( ! k && ! v) {
-                 // An error ocurred enumerating key values.
-                 hasError = YES;
-                 return;
-             }
-             
+        BOOL success = [variable enumerateKeyValuesWithVariables:variables escaper:[self escaper] error:error block:^(NSString *key, NSString *value) {
              [result appendString:@";"];
              
-             [result appendString:k];
+             [result appendString:key];
              
-             if ( ! [v isEqualToString:@""]) {
+             if ( ! [value isEqualToString:@""]) {
                  [result appendString:@"="];
-                 [result appendString:v];
+                 [result appendString:value];
              }
          }];
-    }
-    
-    if (hasError) {
-        return nil;
+        
+        if ( ! success) return nil;
     }
     
     return [NSString stringWithString:result];
@@ -670,7 +643,7 @@
     return self;
 }
 
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper error:(NSError *__autoreleasing *)error
 {
     id value = [variables objectForKey:key];
     if ( ! value || (NSNull *) value == [NSNull null]) {
@@ -688,24 +661,25 @@
     return [NSArray arrayWithArray:result];
 }
 
-- (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
+- (BOOL)enumerateKeyValuesWithVariables:(NSDictionary *)variables
                                 escaper:(id<CSURITemplateEscaper>)escaper
-                                  block:(void (^)(NSString *key, NSString *value))block
+                                  error:(NSError *__autoreleasing *)error
+                                  block:(void (^)(NSString *, NSString *))block
 {
     id value = [variables objectForKey:key];
     if ( ! value || (NSNull *) value == [NSNull null]) {
-        return;
+        return YES;
     }
     
     if ([value isEqual:@[]]) {
         block(key, @"");
-        return;
+        return YES;
     }
     
     NSString *escaped = [value escapeWithEscaper:escaper];
     block(key, escaped);
+    return YES;
 }
-
 
 @end
 
@@ -728,7 +702,7 @@
     return self;
 }
 
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper error:(NSError *__autoreleasing *)error
 {
     id values = [variables objectForKey:key];
     if ( ! values) {
@@ -744,18 +718,20 @@
     return [NSArray arrayWithArray:result];
 }
 
-- (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
+- (BOOL)enumerateKeyValuesWithVariables:(NSDictionary *)variables
                                 escaper:(id<CSURITemplateEscaper>)escaper
-                                  block:(void (^)(NSString *key, NSString *value))block
+                                  error:(NSError *__autoreleasing *)error
+                                  block:(void (^)(NSString *, NSString *))block
 {
     id values = [variables objectForKey:key];
     if ( ! values) {
-        return;
+        return YES;
     }
     
     [values enumerateExplodedItemsEscapedWithEscaper:escaper
                                           defaultKey:key
                                                block:block];
+    return YES;
 }
 
 @end
@@ -783,12 +759,14 @@
     return self;
 }
 
-- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper
+- (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper error:(NSError *__autoreleasing *)error
 {
     id value = [variables objectForKey:key];
     
-    if ([value isInvalidForPrefixVariable]) {
-        // Only simple strings may be prefixed.
+    if ( ! [value isKindOfClass:[NSString class]]) {
+        NSString *failureReason = [NSString stringWithFormat:NSLocalizedString(@"Variables with a maximum length modifier can only be expanded with string values, but a value of type '%@' given.", nil), [value class]];
+        NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"An unexpandable value was given for a template variable.", nil), NSLocalizedFailureReasonErrorKey: failureReason };
+        if (error) *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorInvalidExpansionValue userInfo:userInfo];
         return nil;
     }
     
@@ -807,20 +785,21 @@
     return [NSArray arrayWithArray:result];
 }
 
-- (void)enumerateKeyValuesWithVariables:(NSDictionary *)variables
+- (BOOL)enumerateKeyValuesWithVariables:(NSDictionary *)variables
                                 escaper:(id<CSURITemplateEscaper>)escaper
-                                  block:(void (^)(NSString *key, NSString *value))block
+                                  error:(NSError *__autoreleasing *)error
+                                  block:(void (^)(NSString *, NSString *))block
 {
-    NSArray *values = [self valuesWithVariables:variables escaper:escaper];
+    NSArray *values = [self valuesWithVariables:variables escaper:escaper error:error];
     if ( ! values) {
         // An error was encountered expanding the variables.
-        block(nil, nil);
-        return;
+        return NO;
     }
     
     for (NSString *value in values) {
         block(key, value);
     }
+    return YES;
 }
 
 @end
@@ -829,32 +808,52 @@
 
 @interface CSURITemplate ()
 
-@property (nonatomic, strong) NSString *URITemplate;
+@property (nonatomic, copy, readwrite) NSString *templateString;
+@property (nonatomic, copy, readwrite) NSURL *baseURL;
 @property (nonatomic, strong) NSMutableArray *terms;
-@property (readonly) BOOL hasError;
 
 @end
 
 @implementation CSURITemplate
 
-@synthesize URITemplate;
-@synthesize terms;
-@synthesize hasError;
++ (instancetype)URITemplateWithString:(NSString *)templateString error:(NSError **)error
+{
+    CSURITemplate *URITemplate = [[self alloc] initWithTemplateString:templateString];
+    BOOL success = [URITemplate parseTemplate:error];
+    return success ? URITemplate : nil;
+}
 
-- (id)initWithURITemplate:(NSString *)aURITemplate
++ (instancetype)URITemplateWithString:(NSString *)templateString relativeToURL:(NSURL *)baseURL error:(NSError **)error
+{
+    CSURITemplate *URITemplate = [self URITemplateWithString:templateString error:error];
+    URITemplate.baseURL = baseURL;
+    return URITemplate;
+}
+
+- (id)initWithTemplateString:(NSString *)templateString
 {
     self = [super init];
     if (self) {
-        URITemplate = aURITemplate;
+        self.templateString = templateString;
+        self.terms = [NSMutableArray array];
     }
-    
     return self;
 }
 
-- (NSObject<CSURITemplateVariable> *)variableWithVarspec:(NSString *)varspec
+- (id)init
 {
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Failed to call designated initializer. Invoke `URITemplateWithString:error:` or `URITemplateWithString:relativeToURL:error:` instead" userInfo:nil];
+}
+
+- (NSObject<CSURITemplateVariable> *)variableWithVarspec:(NSString *)varspec error:(NSError **)error
+{
+    NSParameterAssert(varspec);
+    NSParameterAssert(error);
     if ([varspec rangeOfString:@"$"].location != NSNotFound) {
         // Varspec contains a forbidden character.
+        NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"The template contains an invalid variable key.", nil),
+                                    NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"A variable key containing the forbidden character '$' was encountered.", nil) };
+        *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorInvalidVariableKey userInfo:userInfo];
         return nil;
     }
     NSMutableCharacterSet *varchars = [NSMutableCharacterSet alphanumericCharacterSet];
@@ -874,6 +873,10 @@
 
         if ( ! [scanner isAtEnd]) {
             // There were extra characters after the explode modifier.
+            NSString *failureReason = [NSString stringWithFormat:NSLocalizedString(@"Extra characters were found after the explode modifier ('*') for the variable '%@'.", nil), key];
+            NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"The template contains an invalid variable modifier.", nil),
+                                        NSLocalizedFailureReasonErrorKey: failureReason };
+            *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorInvalidVariableModifier userInfo:userInfo];
             return nil;
         }
         
@@ -885,6 +888,10 @@
         NSString *firstDigit = @"";
         if ( ! [scanner scanCharactersFromSet:oneToNine intoString:&firstDigit]) {
             // The max-chars does not start with a valid digit.
+            NSString *failureReason = [NSString stringWithFormat:NSLocalizedString(@"The variable '%@' was followed by the maximum length modifier (':'), but the maximum length argument was prefixed with an invalid character.", nil), key];
+            NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"The template contains an invalid variable modifier.", nil),
+                                        NSLocalizedFailureReasonErrorKey: failureReason };
+            *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorInvalidVariableModifier userInfo:userInfo];
             return nil;
         }
         NSString *restDigits = @"";
@@ -893,6 +900,10 @@
         
         if ( ! [scanner isAtEnd]) {
             // The max-chars is not entirely digits.
+            NSString *failureReason = [NSString stringWithFormat:NSLocalizedString(@"The variable '%@' was followed by the maximum length modifier (':'), but the maximum length argument is not numeric.", nil), key];
+            NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"The template contains an invalid variable modifier.", nil),
+                                        NSLocalizedFailureReasonErrorKey: failureReason };
+            *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorInvalidVariableModifier userInfo:userInfo];
             return nil;
         }
 
@@ -904,6 +915,10 @@
         
         if ( ! [scanner isAtEnd]) {
             // There were extra characters after the key.
+            NSString *failureReason = [NSString stringWithFormat:NSLocalizedString(@"The variable key '%@' is invalid.", nil), varspec];
+            NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"The template contains an invalid variable key.", nil),
+                                        NSLocalizedFailureReasonErrorKey: failureReason };
+            *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorInvalidVariableKey userInfo:userInfo];
             return nil;
         }
         
@@ -913,8 +928,10 @@
     return nil;
 }
 
-- (NSArray *)variablesWithVariableList:(NSString *)variableList
+- (NSArray *)variablesWithVariableList:(NSString *)variableList error:(NSError **)error
 {
+    NSParameterAssert(variableList);
+    NSParameterAssert(error);
     NSMutableArray *variables = [NSMutableArray array];
     NSScanner *scanner = [NSScanner scannerWithString:variableList];
     [scanner setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
@@ -923,7 +940,7 @@
         NSString *varspec = nil;
         [scanner scanUpToString:@"," intoString:&varspec];
         [scanner scanString:@"," intoString:NULL];
-        NSObject<CSURITemplateVariable> *variable = [self variableWithVarspec:varspec];
+        NSObject<CSURITemplateVariable> *variable = [self variableWithVarspec:varspec error:error];
         if ( ! variable) {
             // An error was encountered parsing the varspec.
             return nil;
@@ -935,13 +952,20 @@
 
 - (NSObject<CSURITemplateTerm> *)termWithOperator:(NSString *)operator
                                      variableList:(NSString *)variableList
+                                            error:(NSError **)error
 {
+    NSParameterAssert(variableList);
+    NSParameterAssert(error);
     if ([operator length] > 1) {
         // The term has an invalid operator.
+        NSString *failureReason = [NSString stringWithFormat:NSLocalizedString(@"An operator was encountered with a length greater than 1 character ('%@').", nil), operator];
+        NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"An invalid operator was encountered.", nil),
+                                    NSLocalizedFailureReasonErrorKey : failureReason };
+        *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorInvalidOperator userInfo:userInfo];
         return nil;
     }
     
-    NSArray *variables = [self variablesWithVariableList:variableList];
+    NSArray *variables = [self variablesWithVariableList:variableList error:error];
     if ( ! variables) {
         // An error was encountered parsing a variable.
         return nil;
@@ -965,11 +989,15 @@
         return [[CSURITemplateCommaExpressionTerm alloc] initWithVariables:variables];
     } else {
         // The operator is unknown or reserved.
+        NSString *failureReason = [NSString stringWithFormat:NSLocalizedString(@"The URI template specification does not include an operator for the character '%@'.", nil), operator];
+        NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"An unknown operator was encountered.", nil),
+                                    NSLocalizedFailureReasonErrorKey : failureReason };
+        *error = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorUnknownOperator userInfo:userInfo];
         return nil;
     }
 }
 
-- (NSObject<CSURITemplateTerm> *)termWithExpression:(NSString *)expression
+- (NSObject<CSURITemplateTerm> *)termWithExpression:(NSString *)expression error:(NSError **)error
 {
     NSCharacterSet *operators = [NSCharacterSet characterSetWithCharactersInString:@"+#./;?&=,!@|"];
     NSScanner *scanner = [NSScanner scannerWithString:expression];
@@ -978,18 +1006,14 @@
     NSString *operator = nil;
     [scanner scanCharactersFromSet:operators intoString:&operator];
     return [self termWithOperator:operator
-                     variableList:[expression substringFromIndex:scanner.scanLocation]];
+                     variableList:[expression substringFromIndex:scanner.scanLocation]
+                            error:error];
 }
 
-- (void)loadTerms
+- (BOOL)parseTemplate:(NSError **)error
 {
-    if (terms || hasError) {
-        return;
-    }
-    
-    terms = [NSMutableArray array];
-    
-    NSScanner *scanner = [NSScanner scannerWithString:URITemplate];
+    NSError *parsingError = nil;
+    NSScanner *scanner = [NSScanner scannerWithString:self.templateString];
     [scanner setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
     while ( ! [scanner isAtEnd]) {
         NSCharacterSet *curlyBrackets = [NSCharacterSet
@@ -999,56 +1023,74 @@
                                     intoString:&literal]) {
             CSURITemplateLiteralTerm *term = [[CSURITemplateLiteralTerm alloc]
                                                  initWithLiteral:literal];
-            [terms addObject:term];
+            [self.terms addObject:term];
         }
         
         NSString *curlyBracket = nil;
         [scanner scanCharactersFromSet:curlyBrackets intoString:&curlyBracket];
         if ([curlyBracket isEqualToString:@"}"]) {
             // An expression was closed but not opened.
-            hasError = YES;
-            return;
+            NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"An expression was closed that was never opened.", nil),
+                                        NSLocalizedFailureReasonErrorKey : NSLocalizedString(@"A closing '}' character was encountered that was not preceeded by an opening '{' character.", nil),
+                                        CSURITemplateErrorScanLocationErrorKey: @(scanner.scanLocation) };
+            parsingError = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorExpressionClosedButNeverOpened userInfo:userInfo];
+            break;
         }
         
         NSString *expression = nil;
         if ([scanner scanUpToString:@"}" intoString:&expression]) {
             if ( ! [scanner scanString:@"}" intoString:NULL]) {
                 // An expression was opened not closed.
-                hasError = YES;
-                return;
+                NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"An expression was opened but never closed.", nil),
+                                            NSLocalizedFailureReasonErrorKey : NSLocalizedString(@"An opening '{' character was never terminated by  '{' character.", nil),
+                                            CSURITemplateErrorScanLocationErrorKey: @(scanner.scanLocation) };
+                parsingError = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorExpressionOpenedButNeverClosed userInfo:userInfo];
+                break;
             }
             
-            NSObject<CSURITemplateTerm> *term = [self termWithExpression:expression];
+            NSObject<CSURITemplateTerm> *term = [self termWithExpression:expression error:&parsingError];
             if ( ! term) {
-                // An error was encountered parsing the term expression.
-                hasError = YES;
-                return;
+                // An error was encountered parsing the term expression. Include the scan location in the error
+                NSMutableDictionary *mutableUserInfo = [[parsingError userInfo] mutableCopy];
+                mutableUserInfo[CSURITemplateErrorScanLocationErrorKey] = @(scanner.scanLocation);
+                break;
             }
             
-            [terms addObject:term];
+            [self.terms addObject:term];
         }
     }
+    
+    if (parsingError && error) *error = parsingError;
+    return parsingError ? NO : YES;
 }
 
-- (NSString *)URIWithVariables:(NSDictionary *)variables
+- (NSString *)relativeStringWithVariables:(NSDictionary *)variables error:(NSError **)error
 {
-    [self loadTerms];
-    if (hasError) {
-        // An error was encountered parsing the template.
+    NSError *expansionError = nil;
+    if ( ! variables) {
+        NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"A template cannot be expanded without a dictionary of variables.", nil) };
+        expansionError = [NSError errorWithDomain:CSURITemplateErrorDomain code:CSURITemplateErrorNoVariables userInfo:userInfo];
+        if (error) *error = expansionError;
         return nil;
     }
-    
     NSMutableString *result = [NSMutableString string];
-    for (NSObject<CSURITemplateTerm> *term in terms) {
-        NSString *value = [term expandWithVariables:variables];
+    BOOL errorEncountered = NO;
+    for (NSObject<CSURITemplateTerm> *term in self.terms) {
+        NSString *value = [term expandWithVariables:variables error:&expansionError];
         if ( ! value) {
             // An error was encountered expanding the term.
-            hasError = YES;
-            return nil;
+            errorEncountered = YES;
+            break;
         }
         [result appendString:value];
     }
-    return [NSString stringWithString:result];
+    if (expansionError && error) *error = expansionError;
+    return errorEncountered ? nil : [result copy];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p templateString=\"%@\"", self.class, self, self.templateString];
 }
 
 @end
