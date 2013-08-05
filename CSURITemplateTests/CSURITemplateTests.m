@@ -307,4 +307,27 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
     STAssertEqualObjects(@"Variables with a maximum length modifier can only be expanded with string values, but a value of type '__NSArrayI' given.", [error localizedFailureReason], nil);
 }
 
+#pragma mark - Deprecations
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+- (void)testDeprecatedInitializer
+{
+    CSURITemplate *URITemplate = [[CSURITemplate alloc] initWithURITemplate:@"{variable}"];
+    NSDictionary *variables = @{ @"variable": @"value" };
+    NSString *expandedString = [URITemplate relativeStringWithVariables:variables error:nil];
+    STAssertEqualObjects(@"value", expandedString, nil);
+}
+
+- (void)testDeprecatedExpansion
+{
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{variable}" error:nil];
+    NSDictionary *variables = @{ @"variable": @"value" };
+    NSString *expandedString = [URITemplate URIWithVariables:variables];
+    STAssertEqualObjects(@"value", expandedString, nil);
+}
+
+#pragma clang diagnostic pop
+
 @end
