@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CSURITemplate"
-  s.version      = "0.1.1"
+  s.version      = "0.2"
   s.summary      = "Implementation of the URI Template spec."
   s.homepage     = "https://github.com/cogenta/CSURITemplate"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
