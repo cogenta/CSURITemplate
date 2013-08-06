@@ -14,8 +14,12 @@ NSError *error = nil;
 CSURITemplate *template = [CSURITemplate URITemplateWithString:@"{?list*}"
                                                          error:&error];
 NSDictionary *variables = @{@"list": @[@"red", @"green", @"blue"]};
-NSString *uri = [template relativeStringWithVariables:variables];
+NSString *uri = [template relativeStringWithVariables:variables error:&error];
 assert([uri isEqualToString:@"?list=red&list=green&list=blue"]);
+
+NSURL *baseURL = [NSURL URLWithString:@"http://www.example.com"];
+NSURL *URL = [template URLWithVariables:variables relativeeToURL:baseURL error:&error];
+assert([uri isEqualToString:@"http://www.example.com?list=red&list=green&list=blue"]);
 ```
 
 Installation

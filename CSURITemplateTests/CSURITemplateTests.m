@@ -330,4 +330,28 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
 
 #pragma clang diagnostic pop
 
+#pragma mark - URL Expansion
+
+- (void)testThatExpandingToURLWithErrorReturnsNil
+{
+    NSURL *baseURL = [NSURL URLWithString:@"http://www.example.com/"];
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{variable:1}" error:nil];
+    NSDictionary *variables = @{ @"variable": @[ @"one", @"two" ] };
+    NSURL *URL = [URITemplate URLWithVariables:variables relativeToBaseURL:baseURL error:&error];
+    STAssertNil(URL, nil);
+    STAssertNotNil(error, nil);
+}
+
+- (void)testThatExpandingToURLReturnsExpectedURL
+{
+    NSURL *baseURL = [NSURL URLWithString:@"http://www.example.com/"];
+    NSError *error = nil;
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"{variable}" error:nil];
+    NSDictionary *variables = @{ @"variable": @"value" };
+    NSURL *URL = [URITemplate URLWithVariables:variables relativeToBaseURL:baseURL error:&error];
+    STAssertEqualObjects(@"http://www.example.com/value", [URL absoluteString], nil);
+    STAssertEqualObjects(baseURL, [URL baseURL], nil);
+}
+
 @end
