@@ -11,14 +11,4 @@ Pod::Spec.new do |s|
   s.source_files = 'CSURITemplate', 'CSURITemplate/**/*.{h,m}'
   s.public_header_files = 'CSURITemplate/CSURITemplate.h'
   s.requires_arc = true
-  s.documentation = {
-    :appledoc => [
-      '--project-name',      'CSURITemplate',
-      '--project-company',   'Cogenta Systems Ltd',
-      '--docset-copyright',  'Cogenta Systems Ltd',
-      '--ignore',            'Common',
-      '--index-desc',        'README.md',
-      '--no-keep-undocumented-objects',
-      '--no-keep-undocumented-members',
-    ]}
 end
