@@ -1088,6 +1088,13 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
     return errorEncountered ? nil : [result copy];
 }
 
+- (NSURL *)URLWithVariables:(NSDictionary *)variables relativeToBaseURL:(NSURL *)baseURL error:(NSError **)error
+{
+    NSString *expandedTemplate = [self relativeStringWithVariables:variables error:error];
+    if ( ! expandedTemplate) return nil;
+    return [NSURL URLWithString:expandedTemplate relativeToURL:baseURL];
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p templateString=\"%@\"", self.class, self, self.templateString];
