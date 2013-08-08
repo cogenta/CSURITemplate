@@ -65,13 +65,13 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 @interface NSObject (URITemplateAdditions)
 
-- (NSString *)stringEscapedForURI;
-- (NSString *)stringEscapedForFragment;
-- (NSString *)basicString;
-- (NSArray *)explodedItems;
-- (NSArray *)explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper;
-- (NSString *)escapeWithEscaper:(id<CSURITemplateEscaper>)escaper;
-- (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
+- (NSString *)csuri_stringEscapedForURI;
+- (NSString *)csuri_stringEscapedForFragment;
+- (NSString *)csuri_basicString;
+- (NSArray *)csuri_explodedItems;
+- (NSArray *)csuri_explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper;
+- (NSString *)csuri_escapeWithEscaper:(id<CSURITemplateEscaper>)escaper;
+- (void)csuri_enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)key
                                            block:(void (^)(NSString *key, NSString *value))block;
 @end
@@ -80,7 +80,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 - (NSString *)escapeItem:(NSObject *)item
 {
-    return [item stringEscapedForURI];
+    return [item csuri_stringEscapedForURI];
 }
 
 @end
@@ -89,52 +89,52 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 - (NSString *)escapeItem:(NSObject *)item
 {
-    return [item stringEscapedForFragment];
+    return [item csuri_stringEscapedForFragment];
 }
 
 @end
 
 @implementation NSObject (URITemplateAdditions)
 
-- (NSString *)escapeWithEscaper:(id<CSURITemplateEscaper>)escaper
+- (NSString *)csuri_escapeWithEscaper:(id<CSURITemplateEscaper>)escaper
 {
     return [escaper escapeItem:self];
 }
 
-- (NSString *)stringEscapedForURI
+- (NSString *)csuri_stringEscapedForURI
 {
-    return [[self basicString] stringEscapedForURI];
+    return [[self csuri_basicString] csuri_stringEscapedForURI];
 }
 
-- (NSString *)stringEscapedForFragment
+- (NSString *)csuri_stringEscapedForFragment
 {
-    return [[self basicString] stringEscapedForFragment];
+    return [[self csuri_basicString] csuri_stringEscapedForFragment];
 }
 
-- (NSString *)basicString
+- (NSString *)csuri_basicString
 {
     return [self description];
 }
 
-- (NSArray *)explodedItems
+- (NSArray *)csuri_explodedItems
 {
     return [NSArray arrayWithObject:self];
 }
 
-- (NSArray *)explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
+- (NSArray *)csuri_explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
 {
     NSMutableArray *result = [NSMutableArray array];
-    for (id value in [self explodedItems]) {
-        [result addObject:[value escapeWithEscaper:escaper]];
+    for (id value in [self csuri_explodedItems]) {
+        [result addObject:[value csuri_escapeWithEscaper:escaper]];
     }
     return [NSArray arrayWithArray:result];
 }
 
-- (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
+- (void)csuri_enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)key
                                            block:(void (^)(NSString *, NSString *))block
 {
-    for (NSString *value in [self explodedItemsEscapedWithEscaper:escaper]) {
+    for (NSString *value in [self csuri_explodedItemsEscapedWithEscaper:escaper]) {
         block(key, value);
     }
 }
@@ -143,7 +143,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 @implementation NSString (URITemplateAdditions)
 
-- (NSString *)stringEscapedForURI
+- (NSString *)csuri_stringEscapedForURI
 {
     return (NSString *)
     CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,
@@ -153,7 +153,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
                                                               kCFStringEncodingUTF8));
 }
 
-- (NSString *)stringEscapedForFragment
+- (NSString *)csuri_stringEscapedForFragment
 {
     return (NSString *)
     CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,
@@ -163,7 +163,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
                                                               kCFStringEncodingUTF8));
 }
 
-- (NSString *)basicString
+- (NSString *)csuri_basicString
 {
     return self;
 }
@@ -172,35 +172,35 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 @implementation NSArray (URITemplateAdditions)
 
-- (NSString *)stringEscapedForURI
+- (NSString *)csuri_stringEscapedForURI
 {
     NSMutableArray *result = [NSMutableArray array];
     for (id item in self) {
-        [result addObject:[item stringEscapedForURI]];
+        [result addObject:[item csuri_stringEscapedForURI]];
     }
     return [result componentsJoinedByString:@","];
 }
 
 
-- (NSString *)stringEscapedForFragment
+- (NSString *)csuri_stringEscapedForFragment
 {
     NSMutableArray *result = [NSMutableArray array];
     for (id item in self) {
-        [result addObject:[item stringEscapedForFragment]];
+        [result addObject:[item csuri_stringEscapedForFragment]];
     }
     return [result componentsJoinedByString:@","];
 }
 
-- (NSString *)basicString
+- (NSString *)csuri_basicString
 {
     NSMutableArray *result = [NSMutableArray array];
     for (id item in self) {
-        [result addObject:[item basicString]];
+        [result addObject:[item csuri_basicString]];
     }
     return [result componentsJoinedByString:@","];
 }
 
-- (NSArray *)explodedItems
+- (NSArray *)csuri_explodedItems
 {
     return self;
 }
@@ -209,37 +209,37 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 @implementation NSDictionary (URITemplateAdditions)
 
-- (NSString *)stringEscapedForURI
+- (NSString *)csuri_stringEscapedForURI
 {
     NSMutableArray *result = [NSMutableArray array];
     [self enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        [result addObject:[key stringEscapedForURI]];
-        [result addObject:[obj stringEscapedForURI]];
+        [result addObject:[key csuri_stringEscapedForURI]];
+        [result addObject:[obj csuri_stringEscapedForURI]];
     }];
     return [result componentsJoinedByString:@","];
 }
 
-- (NSString *)stringEscapedForFragment
+- (NSString *)csuri_stringEscapedForFragment
 {
     NSMutableArray *result = [NSMutableArray array];
     [self enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        [result addObject:[key stringEscapedForFragment]];
-        [result addObject:[obj stringEscapedForFragment]];
+        [result addObject:[key csuri_stringEscapedForFragment]];
+        [result addObject:[obj csuri_stringEscapedForFragment]];
     }];
     return [result componentsJoinedByString:@","];
 }
 
-- (NSString *)basicString
+- (NSString *)csuri_basicString
 {
     NSMutableArray *result = [NSMutableArray array];
     [self enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        [result addObject:[key basicString]];
-        [result addObject:[obj basicString]];
+        [result addObject:[key csuri_basicString]];
+        [result addObject:[obj csuri_basicString]];
     }];
     return [result componentsJoinedByString:@","];
 }
 
-- (NSArray *)explodedItems
+- (NSArray *)csuri_explodedItems
 {
     NSMutableArray *result = [NSMutableArray array];
     [self enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
@@ -249,10 +249,10 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
     return [NSArray arrayWithArray:result];
 }
 
-- (NSArray *)explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
+- (NSArray *)csuri_explodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
 {
     NSMutableArray *result = [NSMutableArray array];
-    [self enumerateExplodedItemsEscapedWithEscaper:escaper
+    [self csuri_enumerateExplodedItemsEscapedWithEscaper:escaper
                                         defaultKey:nil
                                              block:^(NSString *k, NSString *v)
     {
@@ -261,13 +261,13 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
     return [NSArray arrayWithArray:result];
 }
 
-- (void)enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
+- (void)csuri_enumerateExplodedItemsEscapedWithEscaper:(id<CSURITemplateEscaper>)escaper
                                       defaultKey:(NSString *)defaultKey
                                            block:(void (^)(NSString *, NSString *))block
 {
     [self enumerateKeysAndObjectsUsingBlock:^(id k, id obj, BOOL *stop) {
-        block([k escapeWithEscaper:escaper],
-              [obj escapeWithEscaper:escaper]);
+        block([k csuri_escapeWithEscaper:escaper],
+              [obj csuri_escapeWithEscaper:escaper]);
     }];
 }
 
@@ -275,7 +275,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 @implementation NSNull (URITemplateDescriptions)
 
-- (NSArray *)explodedItems
+- (NSArray *)csuri_explodedItems
 {
     return [NSArray array];
 }
@@ -655,7 +655,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
     }
     
     NSMutableArray *result = [NSMutableArray array];
-    NSString *escaped = [value escapeWithEscaper:escaper];
+    NSString *escaped = [value csuri_escapeWithEscaper:escaper];
     [result addObject:escaped];
     
     return [NSArray arrayWithArray:result];
@@ -676,7 +676,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
         return YES;
     }
     
-    NSString *escaped = [value escapeWithEscaper:escaper];
+    NSString *escaped = [value csuri_escapeWithEscaper:escaper];
     block(key, escaped);
     return YES;
 }
@@ -711,7 +711,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
     
     NSMutableArray *result = [NSMutableArray array];
     
-    for (id value in [values explodedItemsEscapedWithEscaper:escaper]) {
+    for (id value in [values csuri_explodedItemsEscapedWithEscaper:escaper]) {
         [result addObject:value];
     }
     
@@ -728,7 +728,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
         return YES;
     }
     
-    [values enumerateExplodedItemsEscapedWithEscaper:escaper
+    [values csuri_enumerateExplodedItemsEscapedWithEscaper:escaper
                                           defaultKey:key
                                                block:block];
     return YES;
@@ -775,12 +775,12 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
     }
 
     NSMutableArray *result = [NSMutableArray array];
-    NSString *description = [value basicString];
+    NSString *description = [value csuri_basicString];
     if (maxLength <= [description length]) {
         description = [description substringToIndex:maxLength];
     }
     
-    [result addObject:[description escapeWithEscaper:escaper]];
+    [result addObject:[description csuri_escapeWithEscaper:escaper]];
     
     return [NSArray arrayWithArray:result];
 }
