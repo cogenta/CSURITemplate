@@ -328,6 +328,13 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
     STAssertEqualObjects(@"value", expandedString, nil);
 }
 
+- (void)testDeprecatedExpansionWithNil
+{
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:@"/path/{variable}" error:nil];
+    NSString *expandedString = [URITemplate URIWithVariables:nil];
+    STAssertEqualObjects(@"/path/", expandedString, nil);
+}
+
 #pragma clang diagnostic pop
 
 #pragma mark - URL Expansion

@@ -1113,7 +1113,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 - (NSString *)URIWithVariables:(NSDictionary *)variables
 {
-    return [self relativeStringWithVariables:variables error:nil];
+    return [self relativeStringWithVariables:variables ?: @{} error:nil];
 }
 
 @end
