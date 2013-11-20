@@ -18,7 +18,7 @@ NSString *uri = [template relativeStringWithVariables:variables error:&error];
 assert([uri isEqualToString:@"?list=red&list=green&list=blue"]);
 
 NSURL *baseURL = [NSURL URLWithString:@"http://www.example.com"];
-NSURL *URL = [template URLWithVariables:variables relativeeToURL:baseURL error:&error];
+NSURL *URL = [template URLWithVariables:variables relativeToURL:baseURL error:&error];
 assert([uri isEqualToString:@"http://www.example.com?list=red&list=green&list=blue"]);
 ```
 
