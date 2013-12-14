@@ -25,7 +25,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 @protocol CSURITemplateVariable <NSObject>
 
-@property (readonly) NSString *key;
+@property (nonatomic, readonly) NSString *key;
 - (NSArray *)valuesWithVariables:(NSDictionary *)variables escaper:(id<CSURITemplateEscaper>)escaper error:(NSError **)error;
 - (BOOL)enumerateKeyValuesWithVariables:(NSDictionary *)variables
                                 escaper:(id<CSURITemplateEscaper>)escaper
@@ -650,7 +650,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
         return [NSArray array];
     }
     
-    if ([value isKindOfClass:[NSArray class]] && [value count] == 0) {
+    if ([value isKindOfClass:[NSArray class]] && [(NSArray *)value count] == 0) {
         return [NSArray array];
     }
     
@@ -907,7 +907,7 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
             return nil;
         }
 
-        NSUInteger maxLength = [digits integerValue];
+        NSUInteger maxLength = (NSUInteger)ABS([digits integerValue]);
         return [[CSURITemplatePrefixedVariable alloc] initWithKey:key
                                                         maxLength:maxLength];
     } else {

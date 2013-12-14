@@ -382,6 +382,11 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				WARNING_CFLAGS = (
+					"-Wimplicit-atomic-properties",
+					"-Wstrict-selector-match",
+					"-Wsign-conversion",
+				);
 			};
 			name = Debug;
 		};
@@ -394,6 +399,11 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				WARNING_CFLAGS = (
+					"-Wimplicit-atomic-properties",
+					"-Wstrict-selector-match",
+					"-Wsign-conversion",
+				);
 			};
 			name = Release;
 		};
