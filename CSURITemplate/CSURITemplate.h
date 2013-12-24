@@ -75,6 +75,11 @@ extern NSString *const CSURITemplateErrorScanLocationErrorKey;
  */
 @property (nonatomic, copy, readonly) NSString *templateString;
 
+/**
+ *  The keys of the variable terms in the receiver
+ */
+@property (nonatomic, readonly) NSArray *keysOfVariables;
+
 ///--------------------------------------------
 /// @name Expanding the Template with Variables
 ///--------------------------------------------

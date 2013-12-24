@@ -1095,6 +1095,18 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
     return [NSURL URLWithString:expandedTemplate relativeToURL:baseURL];
 }
 
+- (NSArray *)keysOfVariables
+{
+    NSMutableArray *keys = [NSMutableArray arrayWithCapacity:self.terms.count];
+    for (id <CSURITemplateTerm> term in self.terms) {
+        if (![term respondsToSelector:@selector(variablesExpression)]) continue;
+        for (id <CSURITemplateVariable> variable in [term performSelector:@selector(variablesExpression)]) {
+            [keys addObject:variable.key];
+        }
+    }
+    return keys;
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p templateString=\"%@\"", self.class, self, self.templateString];
