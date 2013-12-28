@@ -361,4 +361,14 @@ objectForSpecFilename(NSString *specFilename, NSError **error)
     STAssertEqualObjects(baseURL, [URL baseURL], nil);
 }
 
+#pragma mark - Keys of Variables
+
+- (void)testThatKeysOfVariablesReturns
+{
+    NSString *string = @"{variable1}/{variable.variable}";
+    CSURITemplate *URITemplate = [CSURITemplate URITemplateWithString:string error:nil];
+    NSArray *keys = URITemplate.keysOfVariables;
+    STAssertEqualObjects(keys, (@[@"variable1", @"variable.variable"]), nil);
+}
+
 @end
